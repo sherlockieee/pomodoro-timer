@@ -21,7 +21,7 @@ export default class App extends Component {
       playing: false,
       workTime: 25,
       breakTime: 5,
-      display: "25:00",
+      display: "00:02",
       current: "work",
       interval: null,
     }
@@ -95,6 +95,7 @@ export default class App extends Component {
 
   reset(){
     this.stopTimer();
+    this.resetSound();
     this.setState({
       playing: false,
       workTime: 25,
@@ -109,35 +110,40 @@ export default class App extends Component {
     this.togglePlayButton();
     if (!this.state.playing){
       if (this.state.current == "work"){
-        this.startTimer(this.state.workTime, "work")
+        this.startTimer(this.state.display, "work")
       } else {
-        this.startTimer(this.state.breakTime, "break")
+        this.startTimer(this.state.display, "break")
       }
     } else {
       this.stopTimer()
     }
   }
 
-  startTimer(time, type){
-    let minutes = time - 1
-    let seconds = 59
+  startTimer(string, type){
+    let arr = string.split(":")
+    let minutes = parseInt(arr[0])
+    let seconds = parseInt(arr[1])
     
     let intervalID = setInterval(() => {
-      let minuteStr = String(minutes).length == 1 ? "0" + String(minutes) : String(minutes);
-      let secondStr = String(seconds).length == 1 ? "0" + String(seconds) : String(seconds);
-      this.setState({
-        display: minuteStr + ":" + secondStr
-      })
-
       if (seconds > 0){
         seconds -= 1
       } else if (minutes > 0){
         minutes -= 1
         seconds = 59
       } else {
+        this.playSound();
         this.stopTimer();
-        type == 'work'? this.startTimer(this.state.breakTime, 'break') : this.startTimer(this.state.breakTime, 'work') 
+        type == 'work'? 
+        this.startTimer(String(this.state.breakTime) + ":00", 'break') 
+        : this.startTimer(String(this.state.workTime) + ":00", 'work') 
       }
+
+      let minuteStr = String(minutes).length == 1 ? "0" + String(minutes) : String(minutes);
+      let secondStr = String(seconds).length == 1 ? "0" + String(seconds) : String(seconds);
+      this.setState({
+        display: minuteStr + ":" + secondStr
+      })
+
     }, 1000)
 
     this.setState({
@@ -145,6 +151,17 @@ export default class App extends Component {
     }
     )
     
+  }
+  
+  playSound = () => {
+    let snd = document.getElementById('beep');
+    snd.play();
+  };
+
+  resetSound = () => {
+    let snd = document.getElementById('beep');
+    snd.pause();
+    snd.currentTime = 0;
   }
 
   stopTimer = () => {
@@ -163,8 +180,11 @@ export default class App extends Component {
         <CountdownDisplay display = {this.state.display} current = {this.state.current}/>
 
         <button id='start_stop' onClick = {this.handleStartStop}>{this.state.playing? "Pause" : "Start"}</button>
+
         <button id = 'reset' onClick = {this.reset}> Reset </button>
+
       </div>
     )
   }
+
 }
