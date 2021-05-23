@@ -6,11 +6,15 @@ export default class BreakSession extends Component {
     }
     render() {
         return (
-            <div>
-                <button id = 'break-increment' onClick = {() => this.props.increase("break")}> Increase </button>
+            <div id = 'BreakSession' className = 'flex-column'>
                 <p id = 'break-label'>Break length</p>
-                <p id = 'break-length'>{this.props.display}</p>
-                <button id = 'break-decrement' onClick = {() => this.props.decrease("break")}> Decrease </button>
+
+                <div className = "flex-row">
+                    <button id = 'break-increment' className = 'button-increment' onClick = {() => this.props.increase("break")}> + </button>
+                    <p id = 'break-length' className = 'font-medium'>{this.props.display}</p>
+                    <button id = 'break-decrement' className = 'button-increment' onClick = {() => this.props.decrease("break")}> - </button>
+
+                </div>
             </div>
         )
     }
